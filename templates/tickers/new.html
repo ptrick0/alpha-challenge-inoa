@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="field">
+            <div class="control">
+                <label class="label" for="{{ form.symbol.id_for_label }}">Symbol:</label>
+                {{ form.symbol }}
+                <a onclick="loadTickerInfo()" class="button is-info is-fullwidth" id="search_btn">Search</a>
+                {{ form.symbol.errors }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <label class="label" for="{{ form.name.id_for_label }}">Name:</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <label class="label" for="{{ form.imageUrl.id_for_label }}">Image Url:</label>
+                {{ form.imageUrl }}
+                {{ form.imageUrl.errors }}
+            </div>
+        </div>
+        <button class="button is-info" type="submit" id="save_btn">Salvar</button>
+    </form>
+
+    <!-- Modals -->
+    <div class="modal" id="modal-info">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="modal-info-title">Error 404</p>
+                <button class="delete" aria-label="close" onclick="modalInfo('close')"></button>
+            </header>
+            <section class="modal-card-body">
+                <p id="modal-info-body">The ticker searched not found!</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-info" onclick="modalInfo('close')">Ok</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        function modalInfo(openClose) {
+            let modal = $("#modal-info");
+
+            if(openClose == 'open') {
+                modal.addClass("is-active");
+            } else if(openClose == 'close') {
+                modal.removeClass("is-active");
+            }
+        }
+
+        function loadTickerInfo() {
+            let ticker = $("#id_symbol").val();
+
+            if (ticker.length < 4) return;
+
+            $("#id_symbol").prop( "disabled", true );
+            $("#save_btn").addClass("is-loading");
+            $("#search_btn").addClass("is-loading");
+
+            $.ajax({
+                method: "POST",
+                url: '{% url "get_ticker_info" %}',
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}',
+                        ticker: ticker},
+                success: (response) => {
+                    let name = $("#id_name");
+                    let image = $("#id_imageUrl");
+
+                    let data = JSON.parse(response);
+
+                    console.log(data);
+
+                    name.val(data.shortName);
+                    image.val(data.logo_url);
+                },
+                error: (response) => {
+                    modalInfo('open');
+                },
+                complete: (response) => {
+                    $("#id_symbol").prop( "disabled", false );
+                    $("#save_btn").removeClass("is-loading");
+                    $("#search_btn").removeClass("is-loading");
+                }
+            });
+        }
+    </script>
+{% endblock %}
