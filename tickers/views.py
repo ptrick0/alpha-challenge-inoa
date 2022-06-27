@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth.decorators import login_required
 from .models import Ticker
 from .forms import TickerForm
 from .services import get_ticker_info
 import json
 
-# Create your views here.
+@login_required
 def index(request):
     tickers = Ticker.objects.all()
     return render(request, "tickers/list.html", context={'tickers': tickers})
 
+@login_required
 def new(request):
 
     if request.method == 'POST':
@@ -22,6 +24,7 @@ def new(request):
 
     return render(request, "tickers/new.html", context={'form': form})
 
+@login_required
 def ticker_info(request):
     if(request.method == "POST"):
         if request.POST['ticker']:

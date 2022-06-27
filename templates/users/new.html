@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container ">
+        <div class="columns is-centered">
+            <div class="column is-half">
+                <h1 class="title is-2">Register</h1>
+                <form method="POST" action="{% url 'register' %}">{% csrf_token %}
+                    {{ form_register.non_field_errors }}
+                    <div class="field">
+                        <div class="control">
+                            <label class="label" for="{{ form_register.first_name.id_for_label }}">{{ form_register.first_name.label }}</label>
+                            {{ form_register.first_name }}
+                            {% if form_register.first_name.errors %}
+                                <div class="notification is-danger">{{ form_register.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label class="label" for="{{ form_register.username.id_for_label }}">{{ form_register.username.label }}</label>
+                            {{ form_register.username }}
+                            {% if form_register.username.errors %}
+                                <div class="notification is-danger">{{ form_register.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label class="label" for="{{ form_register.email.id_for_label }}">{{ form_register.email.label }}</label>
+                            {{ form_register.email }}
+                            {% if form_register.email.errors %}
+                                <div class="notification is-danger">{{ form_register.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label class="label" for="{{ form_register.password1.id_for_label }}">{{ form_register.password1.label }}</label>
+                            {{ form_register.password1 }}
+                            {% if form_register.password1.errors %}
+                                <div class="notification is-danger">{{ form_register.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label class="label" for="{{ form_register.password1.id_for_label }}">{{ form_register.password2.label }}</label>
+                            {{ form_register.password2 }}
+                            {% if form_register.password2.errors %}
+                                <div class="notification is-danger">{{ form_register.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="columns is-vcentered">
+                        <div class="column">
+                            <button type="submit" class="button is-info is-fullwidth">Register</button>
+                        </div>
+                        <div class="column">
+                            <h4 class="title is-4 has-text-centered">Or</h4>
+                        </div>
+                        <div class="column">
+                            <a href="{% url 'login' %}" class="button is-light is-fullwidth">Login</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
