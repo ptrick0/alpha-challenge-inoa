@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="columns is-vcentered">
+        <div class="column">
+            <p class="title is-3">Quotes by ticker</p>
+        </div>
+    </div>
+    <div class="columns is-multiline">
+        {% for ticker in tickers %}
+            <div class="column is-half">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="media">
+                            {% if ticker.imageUrl %}
+                                <div class="media-left">
+                                    <figure class="image is-64x64">
+                                        <img src="{{ ticker.imageUrl }}" alt="ticker image">
+                                    </figure>
+                                </div>
+                            {% endif %}
+                            <div class="media-content">
+                                <p class="title is-4">{{ ticker.symbol }}</p>
+                                <p class="subtitle is-6">{{ ticker.name }}</p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <canvas id="{{ticker.symbol}}-chart">
+                                
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="column">
+                <h1 class="title is-3">No quotes found :(</h1>
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let tickers = JSON.parse('{{serializedTickers|safe}}');
+            
+            tickers.forEach(ticker => {
+                const labels = ticker.quotes.map(quote => quote.moment);
+
+                const data = {
+                    labels: labels,
+                    datasets: [{
+                    label: 'Price',
+                    backgroundColor: 'hsl(204, 86%, 53%)',
+                    borderColor: 'hsl(204, 86%, 53%)',
+                    data: ticker.quotes.map(quote => quote.value),
+                    }]
+                };
+
+                const config = {
+                    type: 'line',
+                    data: data,
+                    options: {}
+                };
+                const myChart = new Chart(
+                    document.getElementById(ticker.symbol+"-chart"),
+                    config
+                );
+            });
+            
+        });
+
+
+    </script>
+{% endblock %}
