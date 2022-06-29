@@ -61,16 +61,49 @@
             </div>
         {% endfor %}
     </div>
+
+    <!-- Modals -->
+    <div class="modal" id="modal-confirm">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="modal-confirm-title">Confirmation required</p>
+            </header>
+            <section class="modal-card-body">
+                <p id="modal-confirm-body">Delete this tunnel (id <span id="tunnelId"></span>)?</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-light" onclick="modalConfirm('close')">Cancel</button>
+                <button class="button is-info" onclick="deleteTunnel()">Confirm</button>
+            </footer>
+        </div>
+        <span hidden id="tunnelUrl"></span>
+    </div>
+
     <script>
+        function modalConfirm(openClose) {
+            let modal = $("#modal-confirm");
+
+            if(openClose == 'open') {
+                modal.addClass("is-active");
+            } else if(openClose == 'close') {
+                modal.removeClass("is-active");
+            }
+        }
+
+        function deleteTunnel() {
+            let tunnelUrl = $("#tunnelUrl").text();
+        
+            window.location = tunnelUrl;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
 
             $('.delete-link').on('click', (e) => {
-                let tunnelId = e.target.getAttribute("data-object-id");
-                let tunnelUrl = e.target.getAttribute("data-object-url");
+                $("#tunnelId").text(e.target.getAttribute("data-object-id"));
+                $("#tunnelUrl").text(e.target.getAttribute("data-object-url"));
 
-                if (confirm("Delete this tunnel (id "+tunnelId+") ?")) {
-                    window.location = tunnelUrl;
-                }
+                modalConfirm('open');
             })
             
             let tunnels = JSON.parse('{{serializedTunnels|safe}}');

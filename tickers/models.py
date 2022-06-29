@@ -10,7 +10,7 @@ class Ticker(models.Model):
         return self.symbol + ' - ' + self.name
 
     def serialize(self):
-        quotes = get_quotes_by_ticker(self).order_by('-id')[:15:-1] #last 15 inserted quotes
+        quotes = get_quotes_by_ticker(self).order_by('moment')[:15] #last 15 inserted quotes
         
         return {
             'symbol': self.symbol,
@@ -20,7 +20,7 @@ class Ticker(models.Model):
         }
 
     def serializeByFrequency(self, frequency):
-        quotes = get_quotes_by_ticker_and_frequency(self, frequency).order_by('-id')[:15:-1] #last 15 inserted quotes by frequency in minutes
+        quotes = get_quotes_by_ticker_and_frequency(self, frequency).order_by('moment')[:15] #last 15 inserted quotes by frequency in minutes
         
         return {
             'symbol': self.symbol,

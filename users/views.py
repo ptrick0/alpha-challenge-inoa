@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from .forms import UserForm, UserAuthenticationForm, UserPasswordForm
 from django.contrib import messages
 
@@ -38,11 +39,13 @@ def custom_register(request):
 
     return render(request, 'users/new.html', {'form_register': form_register})
 
+@login_required
 def custom_logout(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect('list_tickers')
 
+@login_required
 def change_password(request):
     if request.method == "POST":
         form_passw = UserPasswordForm(request.user, request.POST)
