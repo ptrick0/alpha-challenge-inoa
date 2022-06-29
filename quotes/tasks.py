@@ -9,23 +9,26 @@ def get_quotes():
         tick = yf.Ticker(ticker.symbol+".SA")
         ticker_ok = False
 
-        if (tick.info['regularMarketPrice']):
-            ticker_ok = True
-        else:
-            tick = yf.Ticker(ticker.symbol)
+        try:
             if (tick.info['regularMarketPrice']):
                 ticker_ok = True
+            else:
+                tick = yf.Ticker(ticker.symbol)
+                if (tick.info['regularMarketPrice']):
+                    ticker_ok = True
 
 
-        if ticker_ok:
-            history = tick.history(period="1d", interval="1m")
-            
-            last_quote = history['Close'].iloc[-1]
+            if ticker_ok:
+                history = tick.history(period="2d", interval="1m")
+                
+                last_quote = history['Close'].iloc[-1]
 
-            hist = history.iloc[-1] # Picking only last ticker update
-            tick_dict = {
-                'ticker': ticker,
-                'moment': hist.name,
-                'value': hist["Close"]
-            }
-            register_new_quote(tick_dict)
+                hist = history.iloc[-1] # Picking only last ticker update
+                tick_dict = {
+                    'ticker': ticker,
+                    'moment': hist.name.tz_localize(None),
+                    'value': hist["Close"]
+                }
+                register_new_quote(tick_dict)
+        except:
+            continue
