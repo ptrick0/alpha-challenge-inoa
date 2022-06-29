@@ -1,5 +1,130 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.2/chartjs-plugin-annotation.min.js"></script>
+    <script>
+        Chart.register('chartjs-plugin-annotation');
+        Chart.register('chartjs-plugin-datalabels');
+    </script>
+    <div class="columns is-vcentered">
+        <div class="column">
+
+        </div>
+        <div class="column">
+            <a href="{% url 'new_tunnel' %}" class="button is-info is-fullwidth">Add new +</a>
+        </div>
+    </div>
+    <div class="columns is-multiline">
+        {% for tunnel in tunnels %}
+            <div class="column is-half">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="media">
+                            {% if tunnel.ticker.imageUrl %}
+                                <div class="media-left">
+                                    <figure class="image is-64x64">
+                                        <img src="{{ tunnel.ticker.imageUrl }}" alt="ticker image">
+                                    </figure>
+                                </div>
+                            {% endif %}
+                            <div class="media-content">
+                                <p class="title is-4">{{ tunnel.ticker.symbol }}</p>
+                                <p class="subtitle is-6">{{ tunnel.ticker.name }}</p>
+                            </div>
+                            <div class="media-right">
+                                <div class="columns">
+                                    <div class="column">
+                                        <a href="{% url 'edit_tunnel' pk=tunnel.id %}" class="button is-info is-fullwidth">Edit</a>
+                                    </div>
+                                    <div class="column">
+                                        <a  class="button is-info is-fullwidth delete-link"
+                                            data-object-id="{{ tunnel.id }}"
+                                            data-object-url="{% url 'remove_tunnel' pk=tunnel.id %}">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <canvas id="{{tunnel.id}}-chart">
+                                
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="column">
+                <h1 class="title is-3">No tunnels found :(</h1>
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            $('.delete-link').on('click', (e) => {
+                let tunnelId = e.target.getAttribute("data-object-id");
+                let tunnelUrl = e.target.getAttribute("data-object-url");
+
+                if (confirm("Delete this tunnel (id "+tunnelId+") ?")) {
+                    window.location = tunnelUrl;
+                }
+            })
+            
+            let tunnels = JSON.parse('{{serializedTunnels|safe}}');
+            
+            tunnels.forEach(tunnel => {
+                const labels = tunnel.ticker.quotes.map(quote => quote.moment);
+
+                const data = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price',
+                        backgroundColor: 'hsl(204, 86%, 53%)',
+                        borderColor: 'hsl(204, 86%, 53%)',
+                        data: tunnel.ticker.quotes.map(quote => quote.value),
+                    }]
+                };
+
+                const config = {
+                    type: 'line',
+                    data: data,
+                    options: {
+                        plugins: {
+                            autocolors: false,
+                            annotation: {
+                                annotations: {
+                                    line1: {
+                                        type: 'line',
+                                        yMin: tunnel.topLimit,
+                                        yMax: tunnel.topLimit,
+                                        borderColor: 'rgb(255, 99, 132)',
+                                        borderWidth: 4,
+                                    },
+                                    line2: {
+                                        type: 'line',
+                                        yMin: tunnel.bottomLimit,
+                                        yMax: tunnel.bottomLimit,
+                                        borderColor: 'rgb(255, 99, 132)',
+                                        borderWidth: 4,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const myChart = new Chart(
+                    document.getElementById(tunnel.id+"-chart"),
+                    config                    
+                );
+
+                
+            });
+            
+        });
+
+    </script>
 {% endblock %}

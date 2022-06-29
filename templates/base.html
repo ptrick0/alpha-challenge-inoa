@@ -17,11 +17,42 @@
             {% if user.is_authenticated %}
                 <nav class="navbar py-5" role="navigation" aria-label="main navigation">
                     <div class="navbar-brand">
-                        <h1 class="title is-2">Welcome, {{ user.get_username }}</h1>
+                        <div class="navbar-item">
+                            <h1 class="title is-3">Welcome, {{ user.get_username }}</h1>
+                        </div>
+                        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                          </a>
                     </div>
 
-                    <div class="navbar-menu">
+                    <div class="navbar-menu" id="mainNavbar">
                         <div class="navbar-start">
+                            <a href="{% url 'list_tickers' %}"
+                                {% if request.path == '/tickers/' %}
+                                    class="navbar-item has-text-link is-underlined has-text-weight-semibold"
+                                {% else %}
+                                    class="navbar-item has-text-info has-text-weight-semibold"
+                                {% endif %} >
+                                Tickers
+                            </a>
+                            <a href="{% url 'list_quotes' %}"
+                                {% if request.path == '/quotes/' %}
+                                    class="navbar-item has-text-link is-underlined has-text-weight-semibold"
+                                {% else %}
+                                    class="navbar-item has-text-info has-text-weight-semibold"
+                                {% endif %} >
+                                Quotes
+                            </a>
+                            <a href="{% url 'list_tunnels' %}"
+                                {% if request.path == '/tunnels/' %}
+                                    class="navbar-item has-text-link is-underlined has-text-weight-semibold"
+                                {% else %}
+                                    class="navbar-item has-text-info has-text-weight-semibold"
+                                {% endif %} >
+                                Tunnels
+                            </a>
                         </div>
                     </div>
                 
@@ -52,6 +83,13 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 handleMessages();
+
+                // Configure all "navbar-burger" elements
+                $(".navbar-burger").click(function() {
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    $(".navbar-burger").toggleClass("is-active");
+                    $(".navbar-menu").toggleClass("is-active");
+                });
             });
 
             function handleMessages(){

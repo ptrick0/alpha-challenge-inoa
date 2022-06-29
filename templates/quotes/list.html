@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
-{% load tz %}
 
 {% block content %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
     <div class="columns is-vcentered">
         <div class="column">
-            <p class="title is-3">Quotes by ticker</p>
+            
         </div>
     </div>
     <div class="columns is-multiline">
@@ -42,6 +41,8 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            
+            
             let tickers = JSON.parse('{{serializedTickers|safe}}');
             
             tickers.forEach(ticker => {
@@ -59,13 +60,15 @@
 
                 const config = {
                     type: 'line',
-                    data: data,
-                    options: {}
+                    data: data
                 };
+
                 const myChart = new Chart(
                     document.getElementById(ticker.symbol+"-chart"),
                     config
                 );
+
+                
             });
             
         });

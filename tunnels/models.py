@@ -11,3 +11,12 @@ class Tunnel(models.Model):
 
     def __str__(self):
         return self.user.username + " - " + self.ticker.symbol
+
+    def serialize(self):
+        return {
+            'id': self.pk,
+            'ticker': self.ticker.serializeByFrequency(self.frequency),
+            'topLimit': self.topLimit,
+            'bottomLimit': self.bottomLimit,
+            'frequency': self.frequency
+        }

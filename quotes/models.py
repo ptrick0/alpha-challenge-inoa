@@ -11,6 +11,6 @@ class Quote(models.Model):
 
     def serialize(self):
         return {
-            'moment': self.moment.strftime("%Y-%m-%d %H:%M:%S"),
+            'moment': self.moment.strftime("%m/%d %H:%M"),
             'value': self.value
         }

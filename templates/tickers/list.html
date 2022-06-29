@@ -3,7 +3,7 @@
 {% block content %}
     <div class="columns is-vcentered">
         <div class="column">
-            <p class="title is-3">Tickers</p>
+            
         </div>
         <div class="column">
             <a href="{% url 'new_ticker' %}" class="button is-info is-fullwidth">Add new +</a>
@@ -33,7 +33,6 @@
         {% empty %}
             <div class="column">
                 <h1 class="title is-3">No tickers found :(</h1>
-                <span class="subtitle is-4">Try </span><a href="{% url 'new_ticker' %}" class="button is-info">Add new +</a>
             </div>
         {% endfor %}
     </div>

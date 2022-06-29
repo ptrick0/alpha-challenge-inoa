@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import TunnelForm
+from .models import Tunnel
+import json
 
 @login_required
 def index(request):
-    return render(request, "tunnels/list.html", context = {})
+    tunnels = Tunnel.objects.filter(user=request.user)
+    serializedTunnels = json.dumps([tunnel.serialize() for tunnel in tunnels])
+
+    return render(request, "tunnels/list.html", context = {'tunnels': tunnels, 'serializedTunnels': serializedTunnels})
 
 @login_required
 def new(request):
