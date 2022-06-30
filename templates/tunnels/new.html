@@ -56,6 +56,17 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox" for="{{ form.emailNotify.id_for_label }}">
+                            {{ form.emailNotify }}
+                            Recieve recomendations on your e-mail ({{ user.email }})
+                        </label>
+                        {% if form.emailNotify.errors %}
+                            <div class="notification is-danger">{{ form.emailNotify.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
                 <button class="button is-info" type="submit" id="save_btn">Save</button>
             </form>
         </div>
@@ -63,6 +74,12 @@
 
 
     <script>
+        function onLoad(chart) {
+            loadTicker(chart, $("#id_ticker").find(":selected").val());
+            updateTopLimit(chart, $("#id_topLimit").val());
+            updateBottomLimit(chart, $("#id_bottomLimit").val());
+        }
+
         function loadTicker(chart, tickerId) {
             
             $.ajax({
@@ -139,6 +156,8 @@
                 document.getElementById("chart"),
                 config                    
             );
+
+            onLoad(myChart);
 
             $("#id_ticker").change(() => {
                 loadTicker(myChart, $("#id_ticker").find(":selected").val());

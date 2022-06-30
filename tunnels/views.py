@@ -15,6 +15,9 @@ def index(request):
 def new(request):
     if request.method == 'POST':
         form = TunnelForm(request.POST)
+        new_tunnel = form.save(commit=False)
+
+        new_tunnel.user = request.user
         
         if form.is_valid():
             form.save()

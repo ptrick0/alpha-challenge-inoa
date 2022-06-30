@@ -6,10 +6,11 @@ class TunnelForm(forms.ModelForm):
 
     class Meta():
         model = Tunnel
-        fields = ['ticker', 'topLimit', 'bottomLimit', 'frequency']
+        fields = ['ticker', 'topLimit', 'bottomLimit', 'frequency', 'emailNotify']
         widgets = {
             'ticker': forms.Select(attrs={'class': ''}, choices=Ticker.objects.all()),
             'topLimit': forms.NumberInput(attrs={'class': 'input'}),
             'bottomLimit': forms.NumberInput(attrs={'class': 'input'}),
             'frequency': forms.NumberInput(attrs={'class': 'input'}),
+            'emailNotify': forms.CheckboxInput()
         }
