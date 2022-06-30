@@ -16,7 +16,7 @@ def get_quotes_by_ticker(ticker):
 
     return quotes
 
-def get_quotes_by_ticker_and_frequency(ticker, frequency):
+def get_quotes_by_ticker_and_frequency(ticker, frequency=1):
     quotes = Quote.objects.annotate(minute_mod = (F('moment__minute') % frequency)).filter(ticker=ticker, minute_mod=0)
 
     return quotes

@@ -1,5 +1,161 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.2/chartjs-plugin-annotation.min.js"></script>
+    <script>
+        Chart.register('chartjs-plugin-annotation');
+        Chart.register('chartjs-plugin-datalabels');
+    </script>
+
+    <div class="columns">
+        <div class="column">
+            <canvas id="chart">
+                                
+            </canvas>
+        </div>
+        <div class="column">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="field">
+                    <div class="control">
+                        <label class="label" for="{{ form.ticker.id_for_label }}">{{ form.ticker.label }}</label>
+                        <div class="select">
+                            {{ form.ticker }}
+                        </div>
+                        {% if form.ticker.errors %}
+                            <div class="notification is-danger">{{ form.ticker.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="label" for="{{ form.topLimit.id_for_label }}">{{ form.topLimit.label }}</label>
+                        {{ form.topLimit }}
+                        {% if form.topLimit.errors %}
+                            <div class="notification is-danger">{{ form.topLimit.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="label" for="{{ form.bottomLimit.id_for_label }}">{{ form.bottomLimit.label }}</label>
+                        {{ form.bottomLimit }}
+                        {% if form.bottomLimit.errors %}
+                            <div class="notification is-danger">{{ form.bottomLimit.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="label" for="{{ form.frequency.id_for_label }}">{{ form.frequency.label }}</label>
+                        {{ form.frequency }}
+                        {% if form.frequency.errors %}
+                            <div class="notification is-danger">{{ form.frequency.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <button class="button is-info" type="submit" id="save_btn">Save</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        function loadTicker(chart, tickerId) {
+            
+            $.ajax({
+                type: "POST",
+                url: '{% url "get_quotes_by_ticker_and_frequency" %}',
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+                    tickerId: tickerId, frequency: $("#id_frequency").val()},
+                success:  function(response){
+                    if(response){
+                        let data = JSON.parse(response);
+
+                        chart.data.labels = data.map(quote => quote.moment);
+                        chart.data.datasets[0].data = data.map(quote => quote.value);
+                        chart.update();
+                    }
+                },
+                complete: function(response){
+                    
+                }
+            });
+        }
+
+        function updateTopLimit(chart, newLimit) {
+            chart.options.plugins.annotation.annotations.line1.yMin = newLimit;
+            chart.options.plugins.annotation.annotations.line1.yMax = newLimit;
+            chart.update();
+        }
+
+        function updateBottomLimit(chart, newLimit) {
+            chart.options.plugins.annotation.annotations.line2.yMin = newLimit;
+            chart.options.plugins.annotation.annotations.line2.yMax = newLimit;
+            chart.update();
+        }
+
+        $(document).ready(() => {
+            const labels = [];
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Price',
+                    backgroundColor: 'hsl(204, 86%, 53%)',
+                    borderColor: 'hsl(204, 86%, 53%)',
+                    data: [],
+                }]
+            };
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    plugins: {
+                        autocolors: false,
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    borderWidth: 4,
+                                },
+                                line2: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    borderWidth: 4,
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            const myChart = new Chart(
+                document.getElementById("chart"),
+                config                    
+            );
+
+            $("#id_ticker").change(() => {
+                loadTicker(myChart, $("#id_ticker").find(":selected").val());
+            });
+            
+            $("#id_topLimit").keyup(() => {
+                updateTopLimit(myChart, $("#id_topLimit").val());
+            });
+
+            $("#id_bottomLimit").keyup(() => {
+                updateBottomLimit(myChart, $("#id_bottomLimit").val());
+                
+            });
+
+            $("#id_frequency").keyup(() => {
+                loadTicker(myChart, $("#id_ticker").find(":selected").val());
+            });
+        });
+    </script>
 {% endblock %}
